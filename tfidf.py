@@ -2,7 +2,6 @@ from textblob import TextBlob as tb
 
 class TFIDF():
     def __init__(self):
-        print("Initialized.")
         self.tot_freq_dict = {}
         self.doc_freq_dict = {}
         self.corpus_length = 0
