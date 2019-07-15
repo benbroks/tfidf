@@ -43,7 +43,7 @@ class TFIDF():
             self.tot_freq_dict[id_list[index]] = mini_dict
 
             if verbose and ((index/num_docs) >= percent_cut):
-                Print(i/num_docs*100, "percent complete.")
+                print(i/num_docs*100, "percent complete.")
                 percent_cut += 0.05
 
         self.corpus_length += len(str_list)
@@ -69,7 +69,7 @@ class TFIDF():
             self.tot_freq_dict[item] = mini_dict
 
             if verbose and ((i/num_docs) >= percent_cut):
-                Print(i/num_docs*100, "percent complete.")
+                print(i/num_docs*100, "percent complete.")
                 percent_cut += 0.05
 
         self.corpus_length += len(str_list)

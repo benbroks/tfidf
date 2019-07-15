@@ -1,6 +1,6 @@
 # tfidf
 
-Implementation of Term Frequency - Inverse Document Frequency using TextBlob. [This algorithm](http://www.tfidf.com/) is typically used to measure the relative importance of words in documents without relying exclusively on raw frequency. Raw frequency disproportionately values stop words and other common words that show up in nearly any corpus.
+Implementation of Term Frequency - Inverse Document Frequency using [TextBlob](https://textblob.readthedocs.io/en/dev/index.html). [This algorithm](http://www.tfidf.com/) is typically used to measure the relative importance of words in documents without relying exclusively on raw frequency. Raw frequency disproportionately values stop words and other common words that show up in nearly any corpus.
 
 From what I've seen, implementations of tf-idf rarely allow for batch training. Given that I'm often working with datasets of large-ish sizes (~100k docs), I decided to build one out. 
 
