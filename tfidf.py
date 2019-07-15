@@ -19,9 +19,13 @@ class TFIDF():
         str_ = re.sub(r'[^\w\d\s]+', ' ', str_)
         return str_
 
-    def batch_train_w_lists(self,str_list,id_list):
+    def batch_train_w_lists(self,str_list,id_list,verbose=False):
         if len(str_list) != len(id_list):
             raise Exception("Batch Training Error: Mismatched list sizes.")
+
+        # For Verbose
+        num_docs = len(str_list)
+        percent_cut = 0.05
 
         for index, item in enumerate(str_list):
             mini_dict = {}
@@ -36,11 +40,19 @@ class TFIDF():
                         self.doc_freq_dict[word] = 1
                     else:
                         self.doc_freq_dict[word] += 1
-            
             self.tot_freq_dict[id_list[index]] = mini_dict
+
+            if verbose and ((i/num_docs) >= percent_cut):
+                Print(i/num_docs*100, "percent complete.")
+                percent_cut += 0.05
+
         self.corpus_length += len(str_list)
 
-    def batch_train_w_dict(self,str_dict):
+    def batch_train_w_dict(self,str_dict,verbose=False):
+        # For Verbose
+        num_docs = len(str_dict)
+        percent_cut = 0.05
+
         for item in str_dict:
             mini_dict = {}
             if self.clean:
@@ -55,6 +67,11 @@ class TFIDF():
                     else:
                         self.doc_freq_dict[word] += 1
             self.tot_freq_dict[item] = mini_dict
+
+            if verbose and ((i/num_docs) >= percent_cut):
+                Print(i/num_docs*100, "percent complete.")
+                percent_cut += 0.05
+
         self.corpus_length += len(str_list)
             
     def tfidf(self,doc_id,word):
