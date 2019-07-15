@@ -42,7 +42,7 @@ class TFIDF():
                         self.doc_freq_dict[word] += 1
             self.tot_freq_dict[id_list[index]] = mini_dict
 
-            if verbose and ((i/num_docs) >= percent_cut):
+            if verbose and ((index/num_docs) >= percent_cut):
                 Print(i/num_docs*100, "percent complete.")
                 percent_cut += 0.05
 
