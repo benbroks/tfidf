@@ -10,4 +10,4 @@ Data can be input in a couple different ways:
 2. Dictionary of ID keys + String values. Each ID directly maps to a String.
     - call `batch_train_w_dict`
 
-When initializing your TFIDF object, toggle the boolean `clean` parameter to apply string pre-processing prior to training. This way, words like "PaNcakes" and "pancakes" will be considered one and the same! One thing to note: symbols will be replaced with space, so be prepared for "Ben's" to be converted to "ben" and "s", two separate words.
+When initializing your TFIDF object, toggle the boolean `clean` parameter to apply string pre-processing prior to training. This way, words like "PaNcakes" and "pancakes" will be considered one and the same! One thing to note: symbols will be replaced with spaces, so be prepared for "Ben's" to be converted to "ben" and "s", two separate words.
