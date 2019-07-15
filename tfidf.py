@@ -1,10 +1,23 @@
 from textblob import TextBlob as tb
+import pickle
+import re
 
 class TFIDF():
-    def __init__(self):
-        self.tot_freq_dict = {}
-        self.doc_freq_dict = {}
-        self.corpus_length = 0
+    def __init__(self,load_fp=None,clean=False):
+        if load_fp is None:
+            self.tot_freq_dict = {}
+            self.doc_freq_dict = {}
+            self.corpus_length = 0
+            self.clean = clean
+        else:
+            self.load(load_fp)
+
+    def preprocess(self,str_):
+        str_ = str_.strip()
+        str_ = str_.lower()
+        str_ = re.sub('&',' and ',str_)
+        str_ = re.sub(r'[^\w\d\s]+', ' ', str_)
+        return str_
 
     def batch_train_w_lists(self,str_list,id_list):
         if len(str_list) != len(id_list):
@@ -12,6 +25,8 @@ class TFIDF():
 
         for index, item in enumerate(str_list):
             mini_dict = {}
+            if self.clean:
+                item = self.preprocess(item)
             blob = tb(item)
             doc_length = len(blob.words)
             for word in blob.words:
@@ -28,6 +43,8 @@ class TFIDF():
     def batch_train_w_dict(self,str_dict):
         for item in str_dict:
             mini_dict = {}
+            if self.clean:
+                str_dict[item] = self.preprocess(str_dict[item])
             blob = tb(str_dict[item])
             doc_length = len(blob.words)
             for word in blob.words:
@@ -49,3 +66,11 @@ class TFIDF():
         scores = {word: tfidf(doc_id,word) for word in self.tot_freq_dict[doc_id]}
         sorted_words = sorted(scores.items(), key=lambda x: x[1], reverse=True)
         return sorted_words[:n]
+
+    def save(self,fp):
+        with open(fp, 'wb') as pickle_fp:
+            pickle.dump(self,pickle_fp)
+    
+    def load(self,fp):
+        with open(fp, 'rb') as pickle_fp:
+            self = pickle.load(pickle_fp)
