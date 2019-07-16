@@ -14,7 +14,7 @@ When initializing your TFIDF object, toggle the boolean `clean` parameter to app
 
 Output structures:
 1. tfidf(doc_id,word): Returns typical tf-idf value
-2. large_doc_normalized_tfidf(doc_id,word): Largest tf-idf value in a given document is 1.
+2. large_doc_normalized_tfidf(doc_id,word): Largest tf-idf value in a given document is 1. Inspired by [Stanford's description](https://nlp.stanford.edu/IR-book/html/htmledition/maximum-tf-normalization-1.html).
     - First, we calculate the typical value, _t_ = tfidf(doc_id,word)
     - Second, we calculate the maximum tf-idf value within _doc-id_, _max_.
     - Choose some _a_ (usually 0.4), return _a_ + (1-_a_)*_t_/_max_.
