@@ -6,7 +6,6 @@ import os
 import nltk
 
 from nltk.corpus import stopwords
-from build_dat import tunnel_dbConnect
 
 class TFIDF():
     def __init__(self,load_fp=None):
@@ -56,14 +55,23 @@ class TFIDF():
             if verbose and ((index/num_docs) >= percent_cut):
                 print(index/num_docs*100, "percent complete.")
                 percent_cut += 0.001
-
+        
         self.corpus_length += len(str_list)
+        # for normalization
+        self.max_dict = {}
+        for doc_id in self.tot_freq_dict:
+            max = 0
+            for word in self.tot_freq_dict[doc_id]:
+                spec_tfidf = self.tfidf(doc_id,word)
+                if spec_tfidf > max:
+                    max = spec_tfidf
+            self.max_dict[doc_id] = max
 
     def batch_train_w_dict(self,str_dict,verbose=False,percent_cut=0.001,clean=False,include_stop=True):
         # For Verbose
         num_docs = len(str_dict)
 
-        for item in str_dict:
+        for index, item in enumerate(str_dict):
             mini_dict = {}
             if clean:
                 str_dict[item] = self.preprocess(str_dict[item])
@@ -83,24 +91,66 @@ class TFIDF():
                     self.doc_freq_dict[word] += 1
             self.tot_freq_dict[item] = mini_dict
 
-            if verbose and ((i/num_docs) >= percent_cut):
+            if verbose and ((index/num_docs) >= percent_cut):
                 print(index/num_docs*100, "percent complete.")
                 percent_cut += 0.001
-
-        self.corpus_length += len(str_list)
+        
+        self.corpus_length += len(str_dict)
+        # for normalization
+        self.max_dict = {}
+        self.absolute_max = 0
+        for doc_id in self.tot_freq_dict:
+            max = 0
+            for word in self.tot_freq_dict[doc_id]:
+                spec_tfidf = self.tfidf(doc_id,word)
+                if spec_tfidf > max:
+                    max = spec_tfidf
+                    if spec_tfidf > self.absolute_max:
+                        self.absolute_max = spec_tfidf
+            self.max_dict[doc_id] = max
             
     def tfidf(self,doc_id,word):
-        idf = math.log(self.corpus_length / 1 + self.doc_freq_dict[word])
+        idf = math.log(self.corpus_length / (1 + self.doc_freq_dict[word]))
         tf = self.tot_freq_dict[doc_id][word]
         return tf*idf
 
-    def top_n(self, doc_id, n=5):
-        scores = {word: self.tfidf(doc_id,word) for word in self.tot_freq_dict[doc_id]}
+    def large_doc_normalized_tfidf(self,doc_id,word,a=0.4):
+        idf = math.log(self.corpus_length / (1 + self.doc_freq_dict[word]))
+        tf = self.tot_freq_dict[doc_id][word]
+        full = tf*idf
+        normalized = a + (1-a)*full/self.max_dict[doc_id]
+        return normalized
+
+    def small_doc_normalized_tfidf(self,doc_id,word,a=0.4):
+        idf = math.log(self.corpus_length / (1 + self.doc_freq_dict[word]))
+        tf = self.tot_freq_dict[doc_id][word]
+        return tf*idf/self.absolute_max
+
+    def top_n(self, doc_id, n=5,large_doc_normalized=False):
+        if large_doc_normalized and small_doc_normalized:
+            raise Exception("Must choose one or neither normalization type.")
+        elif large_doc_normalized:
+            scores = {word: self.large_doc_normalized_tfidf(doc_id,word) for word in self.tot_freq_dict[doc_id]}
+        elif small_doc_normalized:
+            scores = {word: self.small_doc_normalized_tfidf(doc_id,word) for word in self.tot_freq_dict[doc_id]}
+        else:
+            scores = {word: self.tfidf(doc_id,word) for word in self.tot_freq_dict[doc_id]}
+        
         sorted_words = sorted(scores.items(), key=lambda x: x[1], reverse=True)
         sorted_dict = {}
         for item in sorted_words[:n]:
             sorted_dict[item[0]] = item[1]
         return sorted_dict
+
+    def every_word(self,doc_id,large_doc_normalized=False,small_doc_normalized=False):
+        if large_doc_normalized and small_doc_normalized:
+            raise Exception("Must choose one or neither normalization type.")
+        elif large_doc_normalized:
+            return {word: self.large_doc_normalized_tfidf(doc_id,word) for word in self.tot_freq_dict[doc_id]}
+        elif small_doc_normalized:
+            return {word: self.small_doc_normalized_tfidf(doc_id,word) for word in self.tot_freq_dict[doc_id]}
+        else:
+            return {word: self.tfidf(doc_id,word) for word in self.tot_freq_dict[doc_id]}
 
     def save(self,directory_fp):
         if not os.path.exists(directory_fp):
