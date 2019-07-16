@@ -17,7 +17,7 @@ Output structures:
 2. large_doc_normalized_tfidf(doc_id,word): Largest tf-idf value in a given document is 1. Inspired by [Stanford's description](https://nlp.stanford.edu/IR-book/html/htmledition/maximum-tf-normalization-1.html).
     - First, we calculate the typical value, _t_ = tfidf(doc_id,word)
     - Second, we calculate the maximum tf-idf value within _doc-id_, _max_.
-    - Choose some _a_ (usually 0.4), return _a_ + (1-_a_)*_t_/_max_.
+    - Choose some _a_ (usually 0.4), return _a_ + (1-_a_)*_t_ / _max_.
 3. small_doc_normalized_tfidf(doc_id,word): Largest tf-idf value in the entire corpus is 1.
     - After calculating every typical tf-idf value, we find the _absolute max_.
     - Return tfidf(doc_id,word)/_absolute max_.
